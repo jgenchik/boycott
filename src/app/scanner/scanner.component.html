@@ -1,0 +1,25 @@
+
+<!-- <div class="camera">
+    <barcode-scanner-livestream type="code_128" (valueChanges)="onValueChanges($event)" (started)="(onStarted)">
+    </barcode-scanner-livestream>
+</div>
+
+
+<div [hidden]="!barcodeValue">
+    {{ barcodeValue }}
+</div> -->
+
+<!-- <div id="interactive" class="viewport">
+</div> -->
+
+<div class="camera">
+    <zxing-scanner (scanSuccess)="onScanSuccess($event)" (camerasFound)="onCameraFound($event)" 
+                (scanError)="onScanError($event)" 
+                [formats]="allowedFormats"></zxing-scanner>
+</div>
+
+<div [hidden]="!barcodeValue">
+    {{ barcodeValue | json }}
+</div>
+
+<!-- (scanComplete)="onScanComplete($event)" -->
