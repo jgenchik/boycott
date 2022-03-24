@@ -1,14 +1,12 @@
 // import * as dotenv from "dotenv";
 import express, {Application, Request, Response, NextFunction} from "express";
 
-// import { PhotoWidgetsRouter } from "./widgets/photo-widgets.router";
 import cors from "cors";
 import { UpcItemDbRouter } from "./routers/upcitemdb.router";
 // import helmet from "helmet";
-
 // dotenv.config();
 
-const PORT = 7000;
+const PORT = 7003;
  
 const app: Application = express();
 

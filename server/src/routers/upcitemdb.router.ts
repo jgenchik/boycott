@@ -1,5 +1,5 @@
 import express, { Request, Response } from "express";
-import { send } from "process";
+// import { send } from "process";
 const https = require('https');
 const querystring = require('querystring');
 
@@ -25,14 +25,12 @@ UpcItemDbRouter.get("/", async (req: Request, res: Response) => {
 
         res.status(response.status).send(response.data);
 
-        // return {
-        //     statusCode: response.status,
-        //     payload: response.data
-        // };
-
     } catch (error: any) {
         console.error(error);
-        return new Error(error);
+
+        res.status(500).send(error);
+
+        // return new Error(error);
     }
 
 });

@@ -3,7 +3,9 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import Quagga from '@ericblade/quagga2';
 import { BarcodeFormat } from '@zxing/library';
 import { BarcodeScannerLivestreamComponent } from 'ngx-barcode-scanner';
-import { tap } from 'rxjs/operators';
+import { tap, throttleTime } from 'rxjs/operators';
+
+import { environment  } from 'src/environments/environment';
 
 @Component({
   selector: 'app-scanner',
@@ -21,38 +23,15 @@ export class ScannerComponent implements OnInit {
 
   errorMessage = '';
 
+  lastUpc = '';
+
   constructor(private httpClient: HttpClient) {
     
   }
 
   ngOnInit(): void {
 
-    // Quagga.init({
-    //   inputStream: {
-    //     constraints: {
-    //       facingMode: 'environment' // restrict camera type
-    //     },
-    //     area: { // defines rectangle of the detection
-    //       top: '40%',    // top offset
-    //       right: '0%',  // right offset
-    //       left: '0%',   // left offset
-    //       bottom: '40%'  // bottom offset
-    //     },
-    //   },
-    //   decoder: {
-    //     readers: ['ean_reader'] // restrict code types
-    //   },
-    // },
-    // (err) => {
-    //   if (err) {
-    //     this.errorMessage = `QuaggaJS could not be initialized, err: ${err}`;
-    //   } else {
-    //     Quagga.start();
-    //     Quagga.onDetected((res) => {
-    //       window.alert(`code: ${res.codeResult.code}`);
-    //     })
-    //   }
-    // });
+    // this.startScan();
 
   }
 
@@ -60,25 +39,33 @@ export class ScannerComponent implements OnInit {
     // this.barcodeScanner!.start();
   }
 
-  // onValueChanges(result: any) {
-  //   this.barcodeValue = result.codeResult.code;
-  // }
+  onValueChanges(result: any) {
+    this.barcodeValue = result.codeResult.code;
+  }
 
-  // onStarted(started: any) {
-  //   console.log(started);
-  // }
+  onStarted(started: any) {
+    console.log(started);
+  }
 
   onScanSuccess(upc: string) {
-    console.log('scanned', event);
+    console.log('scanned', upc);
 
-    const options = {
-      params: {upc: upc}
-    };
+    if(upc !== this.lastUpc) {
 
-    this.httpClient.get(`http://localhost:7000/upcitemdb`, options).pipe(
-      tap(val => console.log(val)),
-      tap(val => this.barcodeValue = val)
-    ).subscribe();
+      this.lastUpc = upc;
+
+      const options = {
+        params: {upc: upc}
+      };
+  
+      this.httpClient.get(`${environment.API_DOMAIN}/upcitemdb`, options).pipe(
+        tap(val => console.log(val)),
+        tap(val => this.barcodeValue = val)
+      ).subscribe();
+
+    }
+
+    
   }
 
   onCameraFound(event: any) {
@@ -91,6 +78,65 @@ export class ScannerComponent implements OnInit {
 
   onScanComplete(event: any) {
     console.log('onScanComplete', event);
+  }
+
+
+  private startScan() {
+
+    Quagga.init({
+      inputStream: {
+        constraints: {
+          facingMode: 'environment' // restrict camera type
+        },
+        area: { // defines rectangle of the detection
+          top: '40%',    // top offset
+          right: '0%',  // right offset
+          left: '0%',   // left offset
+          bottom: '40%'  // bottom offset
+        },
+      },
+      decoder: {
+        readers: ['ean_reader'] // restrict code types
+      },
+    },
+    (err) => {
+      if (err) {
+        this.errorMessage = `QuaggaJS could not be initialized, err: ${err}`;
+      } else {
+        Quagga.start();
+        Quagga.onDetected((res) => {
+          // window.alert(`code: ${res.codeResult.code}`);
+
+          const opt = {
+            params: {upc: res.codeResult.code ?? ''}
+          };
+
+          // if(this.barcodeValue?.total !> 0) {
+          //   this.httpClient.get(`${environment.API_DOMAIN}/upcitemdb`, opt).pipe(
+          //     throttleTime(3000),
+          //     tap(val => console.log(val)),
+          //     tap(val => this.barcodeValue = val),
+          //     tap(() => Quagga.stop())
+          //   ).subscribe();
+          // }
+          this.httpClient.get(`${environment.API_DOMAIN}/upcitemdb`, opt).pipe(
+            throttleTime(3000),
+            tap(val => console.log(val)),
+            tap(val => this.barcodeValue = val),
+            tap(() => Quagga.stop())
+          ).subscribe();
+          
+        })
+      }
+    });
+
+  }
+
+  clearBarcodeValue() {
+    this.barcodeValue = null;
+    // this.startScan();
+
+    this.lastUpc = '';
   }
 
 
