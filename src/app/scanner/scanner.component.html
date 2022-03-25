@@ -27,7 +27,10 @@
 
 
 <div class="camera">
-    <zxing-scanner (scanSuccess)="onScanSuccess($event)" (camerasFound)="onCameraFound($event)" 
+
+    <div class="messages">{{message}}</div>
+
+    <zxing-scanner (scanSuccess)="onScanSuccess($event)" (camerasFound)="onCameraFound($event)" *ngIf="!barcodeValue"
                 (scanError)="onScanError($event)" 
                 [formats]="allowedFormats"></zxing-scanner>
 

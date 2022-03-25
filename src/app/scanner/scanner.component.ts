@@ -23,6 +23,8 @@ export class ScannerComponent implements OnInit {
 
   errorMessage = '';
 
+  message = '';
+
   lastUpc = '';
 
   constructor(private httpClient: HttpClient) {
@@ -45,10 +47,12 @@ export class ScannerComponent implements OnInit {
 
   onStarted(started: any) {
     console.log(started);
+    this.message += '\nStarted. ';
   }
 
   onScanSuccess(upc: string) {
     console.log('scanned', upc);
+    this.message += '\nScanSuccess. ';
 
     if(upc !== this.lastUpc) {
 
@@ -70,14 +74,18 @@ export class ScannerComponent implements OnInit {
 
   onCameraFound(event: any) {
     console.log('onCameraFound', event);
+    this.message += '\nCameraFound. ';
+
   }
 
   onScanError(event: any) {
     console.log('onScanError', event);
+    this.message += '\nScanError. ';
   }
 
   onScanComplete(event: any) {
     console.log('onScanComplete', event);
+    this.message += '\nScanComplete. ';
   }
 
 
@@ -137,6 +145,7 @@ export class ScannerComponent implements OnInit {
     // this.startScan();
 
     this.lastUpc = '';
+    this.message = '';
   }
 
 

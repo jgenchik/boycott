@@ -7,3 +7,7 @@ barcode-scanner-livestream {
     width: 400px;
     height: 300px;
 }
+
+.messages {
+    @apply h-11 border-2
+}
