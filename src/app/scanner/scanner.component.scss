@@ -11,3 +11,15 @@ barcode-scanner-livestream {
 .messages {
     @apply h-11 border-2
 }
+
+button {
+    @apply mr-4
+}
+
+.mat-form-field {
+    @apply text-xl
+}
+
+.upc-data {
+    @apply mt-6 flex flex-row gap-x-4
+}

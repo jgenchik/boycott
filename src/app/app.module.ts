@@ -12,6 +12,7 @@ import { ScannerComponent } from './scanner/scanner.component';
 
 import { BarcodeScannerLivestreamModule } from "ngx-barcode-scanner";
 import { ZXingScannerModule } from '@zxing/ngx-scanner';
+import { ReactiveFormsModule } from '@angular/forms';
 
 
 const routes: Routes = [
@@ -30,6 +31,7 @@ const routes: Routes = [
     BrowserModule,
     BrowserAnimationsModule,
     HttpClientModule,
+    ReactiveFormsModule,
     SharedModule,
     RouterModule.forRoot(routes, {useHash: true, enableTracing: false}),
     ServiceWorkerModule.register('ngsw-worker.js', {

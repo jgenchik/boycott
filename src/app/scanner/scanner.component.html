@@ -35,12 +35,34 @@
                 [formats]="allowedFormats"></zxing-scanner>
 
 
-    <div [hidden]="!barcodeValue">
+    <!-- <div [hidden]="!barcodeValue">
         {{ barcodeValue | json }}
+    </div> -->
+
+    <button mat-raised-button (click)="clearBarcodeValue()">CLEAR</button>
+    <button mat-raised-button (click)="loadFakeValu()">LOAD FAKE</button>
+
+    <div *ngIf="barcodeValue?.total > 0" class="upc-data">
+
+        <mat-form-field>
+            <mat-label>Title</mat-label>
+            <input matInput [value]="barcodeValue.items[0].title" readonly>
+        </mat-form-field>
+
+        <mat-form-field>
+            <mat-label>Brand</mat-label>
+            <input matInput [value]="barcodeValue.items[0].brand" readonly>
+        </mat-form-field>
+
     </div>
 
-    <button (click)="clearBarcodeValue()">CLEAR</button>
+    <div *ngIf="barcodeValue?.items[0]?.images[0]">
+        <img [src]="barcodeValue.items[0].images[0]" alt="">
+    </div>
+    
+
 </div>
+
 
 
 <!-- (scanComplete)="onScanComplete($event)" -->

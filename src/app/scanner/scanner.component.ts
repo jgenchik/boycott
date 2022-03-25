@@ -41,9 +41,9 @@ export class ScannerComponent implements OnInit {
     // this.barcodeScanner!.start();
   }
 
-  onValueChanges(result: any) {
-    this.barcodeValue = result.codeResult.code;
-  }
+  // onValueChanges(result: any) {
+  //   this.barcodeValue = result.codeResult.code;
+  // }
 
   onStarted(started: any) {
     console.log(started);
@@ -146,6 +146,10 @@ export class ScannerComponent implements OnInit {
 
     this.lastUpc = '';
     this.message = '';
+  }
+
+  loadFakeValu() {
+    this.barcodeValue = {"code":"OK","total":1,"offset":0,"items":[{"ean":"0191554602151","title":"IVGEL Hand Sanitizer Gel 1000ml (33.8oz)","description":"Hand Sanitizer Gel, 33.8oz ounce with 70% ethyl alcohol.","upc":"191554602151","brand":"IVGEL","model":"Wish80z","color":"Other","size":"","dimension":"","weight":"","category":"Health & Beauty","currency":"","lowest_recorded_price":5,"highest_recorded_price":19.99,"images":["https://i5.walmartimages.com/asr/dcfe68c2-9cae-48b9-9433-114d77f1a7ac.10a5dc5993375feb8b4f135c20a6685e.jpeg?odnHeight=450&odnWidth=450&odnBg=ffffff"],"offers":[{"merchant":"Wal-Mart.com","domain":"walmart.com","title":"IVGEL Hand Sanitizer Gel 1000ml (33.8oz)","currency":"","list_price":"","price":8.84,"shipping":"5.99","condition":"New","availability":"","link":"https://www.upcitemdb.com/norob/alink/?id=z2r223w2w233a464s2&tid=1&seq=1648134136&plt=cbfb8ffb353f341431fd869a9bb0075c","updated_t":1638732938}],"elid":"264720227675"}]};
   }
 
 
