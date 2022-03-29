@@ -1,11 +1,13 @@
 import { HttpClient } from '@angular/common/http';
 import { Component, OnInit, ViewChild } from '@angular/core';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import Quagga from '@ericblade/quagga2';
 import { BarcodeFormat } from '@zxing/library';
 import { BarcodeScannerLivestreamComponent } from 'ngx-barcode-scanner';
 import { tap, throttleTime } from 'rxjs/operators';
 
 import { environment  } from 'src/environments/environment';
+import { CompanyStatusService } from './services/company-status.service';
 
 @Component({
   selector: 'app-scanner',
@@ -27,13 +29,16 @@ export class ScannerComponent implements OnInit {
 
   lastUpc = '';
 
-  constructor(private httpClient: HttpClient) {
+  isGoodCompany = false;
+  isBadCompany = false;
+
+  constructor(private httpClient: HttpClient, private snackBar: MatSnackBar, private statusService: CompanyStatusService) {
     
   }
 
   ngOnInit(): void {
 
-    // this.startScan();
+    this.startScan();
 
   }
 
@@ -41,9 +46,10 @@ export class ScannerComponent implements OnInit {
     // this.barcodeScanner!.start();
   }
 
-  // onValueChanges(result: any) {
-  //   this.barcodeValue = result.codeResult.code;
-  // }
+  onValueChanges(result: any) {
+    this.message += '\nonValueChanges. Result: ', result;
+    this.barcodeValue = result.codeResult.code;
+  }
 
   onStarted(started: any) {
     console.log(started);
@@ -94,17 +100,21 @@ export class ScannerComponent implements OnInit {
     Quagga.init({
       inputStream: {
         constraints: {
-          facingMode: 'environment' // restrict camera type
+          facingMode: 'environment', // restrict camera type
+          // width: 640,
+          // width: 450,
+          // height: 300,
         },
         area: { // defines rectangle of the detection
-          top: '40%',    // top offset
+          top: '0%',    // top offset
           right: '0%',  // right offset
           left: '0%',   // left offset
-          bottom: '40%'  // bottom offset
+          bottom: '0%'  // bottom offset
         },
       },
       decoder: {
         readers: ['ean_reader'] // restrict code types
+        // readers: ['code_128_reader']
       },
     },
     (err) => {
@@ -114,10 +124,61 @@ export class ScannerComponent implements OnInit {
         Quagga.start();
         Quagga.onDetected((res) => {
           // window.alert(`code: ${res.codeResult.code}`);
+          // console.log('scanned. res: ', res);
 
-          const opt = {
-            params: {upc: res.codeResult.code ?? ''}
-          };
+          if(res.codeResult.code &&  this.lastUpc.length === 0) {
+            this.lastUpc = res.codeResult.code;
+
+            console.log('scanned. res.codeResult.code: ', res.codeResult.code);
+            
+            this.message += res.codeResult.code+' - '
+
+
+
+            const options = {
+              params: {upc: res.codeResult.code ?? ''}
+            };
+        
+            this.httpClient.get(`${environment.API_DOMAIN}/upcitemdb`, options).pipe(
+              tap(val => console.log(val)),
+              tap(val => this.barcodeValue = val),
+              tap((val: any) => {
+                if(val.total == 0) {
+                  this.snackBar.open(`UPC ${res.codeResult.code} not found`, undefined, {
+                    duration: 2000
+                  });
+                  this.clearBarcodeValue();
+                } else {
+                  let status = this.statusService.evaluateCompany(this.barcodeValue.items[0].brand);
+
+                  if(status) {
+                    this.isGoodCompany = status.status === 'GOOD';
+                    this.isBadCompany = status.status === 'BAD';
+                  }
+                }
+              })
+            ).subscribe();
+
+
+
+            // const opt = {
+            //   params: {upc: res.codeResult.code ?? ''}
+            // };
+
+            // this.httpClient.get(`${environment.API_DOMAIN}/upcitemdb`, opt).pipe(
+            //   throttleTime(3000),
+            //   tap(val => console.log(val)),
+            //   tap(val => this.barcodeValue = val),
+            //   // tap(() => Quagga.stop())
+            // ).subscribe();
+
+          }
+          
+
+
+          // const opt = {
+          //   params: {upc: res.codeResult.code ?? ''}
+          // };
 
           // if(this.barcodeValue?.total !> 0) {
           //   this.httpClient.get(`${environment.API_DOMAIN}/upcitemdb`, opt).pipe(
@@ -127,25 +188,35 @@ export class ScannerComponent implements OnInit {
           //     tap(() => Quagga.stop())
           //   ).subscribe();
           // }
-          this.httpClient.get(`${environment.API_DOMAIN}/upcitemdb`, opt).pipe(
-            throttleTime(3000),
-            tap(val => console.log(val)),
-            tap(val => this.barcodeValue = val),
-            tap(() => Quagga.stop())
-          ).subscribe();
+          // this.httpClient.get(`${environment.API_DOMAIN}/upcitemdb`, opt).pipe(
+          //   throttleTime(3000),
+          //   tap(val => console.log(val)),
+          //   tap(val => this.barcodeValue = val),
+          //   // tap(() => Quagga.stop())
+          // ).subscribe();
           
         })
       }
     });
 
+
+    // Quagga.onDetected(barcode => {
+    //   console.log(' *** in Quagga.onDetected. barcode: ', barcode);
+    // });
+
   }
 
   clearBarcodeValue() {
+
     this.barcodeValue = null;
     // this.startScan();
 
     this.lastUpc = '';
-    this.message = '';
+    // this.message = '';
+
+    this.isGoodCompany = false;
+    this.isBadCompany = false;
+
   }
 
   loadFakeValu() {

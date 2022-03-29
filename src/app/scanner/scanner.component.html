@@ -1,5 +1,7 @@
 
-<!-- <div class="camera">
+<!-- <div class="messages">{{message}}</div>
+
+<div class="camera">
     <barcode-scanner-livestream type="code_128" (valueChanges)="onValueChanges($event)" (started)="(onStarted)">
     </barcode-scanner-livestream>
 </div>
@@ -11,22 +13,61 @@
 
 
 
-
-<!-- <div class="camera">
+<!-- <div class="messages">{{message}}</div> -->
+<button mat-raised-button class="button--clear" *ngIf="barcodeValue" (click)="clearBarcodeValue()">CLEAR</button>
+<div class="camera">
     <div id="interactive" class="viewport" [hidden]="barcodeValue">
     </div>
 
-    <div [hidden]="!barcodeValue">
+    <!-- <div [hidden]="!barcodeValue">
         {{ barcodeValue | json }}
-    </div>
+    </div> -->
+
 </div>
-<button (click)="clearBarcodeValue()">CLEAR</button> -->
+
+<div *ngIf="barcodeValue?.total > 0" class="upc-data" [class.good-company]="isGoodCompany" [class.bad-company]="isBadCompany">
+
+    <div *ngIf="isBadCompany" class="bad-product-message">
+        Boycott this product
+    </div>
+
+    <mat-form-field>
+        <mat-label>Brand</mat-label>
+        <input matInput [value]="barcodeValue.items[0].brand" readonly>
+    </mat-form-field>
+
+    <mat-form-field>
+        <mat-label>Title</mat-label>
+        <input matInput [value]="barcodeValue.items[0].title" readonly>
+    </mat-form-field>
+
+    <mat-form-field>
+        <mat-label>Description</mat-label>
+        <textarea matInput [value]="barcodeValue.items[0].description" readonly></textarea>
+    </mat-form-field>
+
+    <mat-form-field>
+        <mat-label>UPC</mat-label>
+        <input matInput [value]="barcodeValue.items[0].upc" readonly>
+    </mat-form-field>
+
+    <div *ngIf="barcodeValue?.items[0]?.images[0]">
+        <img [src]="barcodeValue.items[0].images[0]" alt="">
+    </div>
+
+
+    <div>Is good: {{isGoodCompany}}  is bad: {{isBadCompany}}</div>
+
+</div>
+
+
+<!-- <button mat-raised-button (click)="loadFakeValu()">LOAD FAKE</button> -->
 
 
 
 
 
-<div class="camera">
+<!-- <div class="camera">
 
     <div class="messages">{{message}}</div>
 
@@ -34,10 +75,6 @@
                 (scanError)="onScanError($event)" 
                 [formats]="allowedFormats"></zxing-scanner>
 
-
-    <!-- <div [hidden]="!barcodeValue">
-        {{ barcodeValue | json }}
-    </div> -->
 
     <button mat-raised-button (click)="clearBarcodeValue()">CLEAR</button>
     <button mat-raised-button (click)="loadFakeValu()">LOAD FAKE</button>
@@ -59,9 +96,8 @@
     <div *ngIf="barcodeValue?.items[0]?.images[0]">
         <img [src]="barcodeValue.items[0].images[0]" alt="">
     </div>
-    
 
-</div>
+</div> -->
 
 
 
